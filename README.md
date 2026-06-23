@@ -1,51 +1,99 @@
-# Recruitment API Test Suite
+# CapsLock API Test Suite
 
-This repository contains an automated test suite for the Media Buyers REST API, designed using PHP and Codeception framework.
+This repository contains a comprehensive test suite for an API using PHP and Codeception framework. The tests validate both GET and POST endpoints for the media buyers resource with proper schema validation, data integrity checks, and content-type verification.
 
-## Project Structure
+## Codeception API Testing Setup
+
+The project uses Codeception as its testing framework with the following modules enabled:
+
+- **REST Module**: Provides REST API testing capabilities for making HTTP requests to endpoints like `/api/mediabuyers`
+- **PhpBrowser Module**: Simulates browser behavior for web tests and provides additional functionality
+- **Asserts Module**: Built-in PHP assertions for validating test results
+
+The configuration in `codeception.yml` defines:
+- Base URL: `http://localhost/api`
+- Content-Type headers set to `application/json`
+- Test suite configuration with proper paths and logging
+
+## Repository Organization
 
 ```
 .
-├── composer.json         # PHP dependencies
-├── .gitignore            # Git ignore rules
-├── README.md             # Project documentation  
-├── schemas/              # JSON schema definitions
-│   ├── get-media-buyers-schema.json
-│   └── post-media-buyer-schema.json
-├── src/                  # Application source code
-│   ├── MediaBuyerFactory.php  # Test data factories
-│   └── SchemaValidator.php    # JSON schema validation logic
-└── tests/                # Test suite
-    └── MediaBuyersTest.php    # 8 automated test cases
+├── composer.json              # Project dependencies and scripts
+├── codeception.yml            # Codeception framework configuration
+├── README.md                  # This documentation file
+├── src/                       # Source files including factories
+│   └── MediaBuyerFactory.php  # Factory for creating test data objects
+├── schemas/                   # JSON schema definitions for validation
+│   ├── get-media-buyers-schema.json    # Schema for GET /api/mediabuyers response
+│   └── post-media-buyer-schema.json    # Schema for POST /api/mediabuyers request payload
+└── tests/                     # Test files
+    └── MediaBuyersTest.php     # Main test class with 8 comprehensive test cases
 ```
 
-## Features
+## Test Scenarios Selected
 
-- **8 Complete Test Cases**: Full API coverage with status code verification, data integrity checks, and schema validation
-- **PHP/Codeception Framework**: Modern testing framework for robust API testing  
-- **JSON Schema Validation**: Ensures all API responses match expected structures
-- **Factory Pattern**: Consistent test data generation
-- **Automated Testing**: Run tests with `composer test` or `vendor/bin/codecept run`
+The following 8 test scenarios were selected to ensure comprehensive API validation:
 
-## Requirements
+1. **GET /api/mediabuyers returns HTTP 200 with correct Content-Type header**
+2. **GET response body conforms to schema** 
+3. **GET data field is always an array (even when empty)**
+4. **GET every item has required fields: id, mbId, initials, name, email, slackUserId, active**
+5. **GET emails are syntactically valid email addresses**
+6. **GET active values are 0 or 1 (integers)**
+7. **GET IDs are unique across the response**
+8. **POST /api/mediabuyers with valid data returns 200, correct content-type and schema validation**
 
-- PHP 7.4+
-- Composer installed
+## Abstractions Introduced
 
-## Setup Instructions
+The project implements several key abstractions that provide value at scale:
 
-1. Install dependencies: `composer install`
-2. Run tests: `composer test` or `vendor/bin/codecept run`
+1. **MediaBuyerFactory**: Centralized factory pattern for creating consistent test data objects
+   - Enables easy generation of valid, minimal, or invalid test payloads  
+   - Reduces code duplication in tests requiring different data sets
+   - Allows parameterization of test data through overrides
 
-## Test Coverage
+2. **JSON Schema Validation**: Standardized validation against defined schema files
+   - Ensures API responses conform to expected structures
+   - Provides clear error messages when validation fails
+   - Makes it easy to update expectations as the API evolves
 
-1. API accessibility verification
-2. Response data structure validation  
-3. Email format validation
-4. Unique ID enforcement
-5. HTTP status code checking
-6. JSON schema compliance
-7. Data integrity checks
-8. Authentication header setup (configured via environment)
+3. **REST Module Integration**: Leverages Codeception's built-in testing capabilities
+   - Streamlines HTTP request handling and response assertions
+   - Improves test readability with fluent interface syntax
+   - Enables consistent test patterns across multiple endpoints
 
-This test suite ensures reliable API functionality and prevents regressions in recruitment system endpoints.
+These abstractions provide:
+- Reduced maintenance overhead when extending to new API endpoints  
+- Consistent behavior for similar operations
+- Easier debugging through centralized logic
+- Improved scalability by abstracting common testing patterns
+
+## Additional Improvements for Scalability/Maintainability
+
+To enhance this project's scalability and maintainability:
+
+1. **Data Setup/Teardown**: Implement fixtures or database seeding mechanisms to ensure consistent test environments
+2. **Parallelization**: Use Codeception's parallel execution capabilities to speed up large test suites  
+3. **CI Integration**: Configure continuous integration pipelines (GitHub Actions, Jenkins) for automated testing on code changes
+4. **Schema Versioning**: Implement schema version control to track API contract evolution over time
+5. **Contract Testing**: Add consumer-driven contracts to verify service compatibility with consumers
+6. **Environment Configuration**: Separate test environments (local, staging, production) with appropriate configuration management
+
+## Assumptions Made Where Contract Is Silent
+
+1. **Response Format Consistency**: Assumes all API responses follow a consistent JSON structure with "data" field for GET requests and proper request payloads for POST
+2. **HTTP Status Codes**: Assumes standard HTTP status codes (200 OK, 400 Bad Request) are appropriate for the given scenarios  
+3. **Data Validations**: Assumes email addresses will follow common formats and that ID fields will be unique integers
+4. **Schema Compliance**: Assumes JSON schemas accurately represent expected response structures and data types
+
+## Files Included
+
+### JSON Schemas
+- `schemas/get-media-buyers-schema.json`: Defines the structure for GET /api/mediabuyers responses  
+- `schemas/post-media-buyer-schema.json`: Defines the structure for POST /api/mediabuyers request payloads
+
+### Helpers
+- `src/MediaBuyerFactory.php`: Factory class for generating test data objects with different configurations (valid, minimal, invalid)
+
+This approach ensures all tests are consistent, maintainable, and can be easily extended as the API grows.
