@@ -1,0 +1,31 @@
+# Codeception Configuration
+namespace: Tests\Unit
+settings:
+    colors: true
+    memory_limit: 1024M
+
+# Add modules to the suite configuration
+modules:
+    # This module provides REST API testing capabilities
+    - REST:
+        url: 'http://localhost/api'
+        depends: PhpBrowser
+        headers:
+            Content-Type: application/json
+    
+    # This module provides browser simulation for web tests
+    - PhpBrowser:
+        url: 'http://localhost'
+
+# Add the configuration to run tests in parallel if needed
+suites:
+    unit:
+        path: .
+        actors: true
+
+# Paths
+paths:
+    tests: .
+    log: var/log
+    data: tests/_data
+    support: tests/_support
