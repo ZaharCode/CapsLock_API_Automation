@@ -4,7 +4,6 @@ namespace Tests\Unit;
 
 use Codeception\Test\Unit;
 use App\Factories\MediaBuyerFactory;
-use App\Helpers\SchemaValidator;
 use Codeception\Util\HttpCode;
 
 class MediaBuyersTest extends Unit
@@ -34,14 +33,7 @@ class MediaBuyersTest extends Unit
         // Mock API call to get media buyers data
         $I->sendGET('/api/mediabuyers');
         $I->seeResponseCodeIs(HttpCode::OK);
-        
-        // Get response data for validation
-        $response = $I->grabResponse();
-        $responseData = json_decode($response, true);
-        
-        // Validate against schema
-        $errors = SchemaValidator::validate($responseData, 'schemas/get-media-buyers-schema.json');
-        $this->assertEmpty($errors, "Schema validation failed: " . implode(', ', $errors));
+        $I->seeResponseMatchesJsonSchemaFile('schemas/get-media-buyers-schema.json');
     }
     
     /**
@@ -60,7 +52,7 @@ class MediaBuyersTest extends Unit
         $responseData = json_decode($response, true);
         
         $this->assertArrayHasKey('data', $responseData);
-        $this->isArray($responseData['data']);
+        $this->assertIsArray($responseData['data']);
     }
     
     /**
@@ -180,13 +172,6 @@ class MediaBuyersTest extends Unit
         $I->sendPOST('/api/mediabuyers', $validData);
         $I->seeResponseCodeIs(HttpCode::OK);
         $I->seeResponseHeaderContains('Content-Type', 'application/json');
-        
-        // Validate response against schema
-        $response = $I->grabResponse();
-        $responseData = json_decode($response, true);
-        
-        // Validate against POST schema
-        $errors = SchemaValidator::validate($responseData, 'schemas/post-media-buyer-schema.json');
-        $this->assertEmpty($errors, "Schema validation failed: " . implode(', ', $errors));
+        $I->seeResponseMatchesJsonSchemaFile('schemas/post-media-buyer-schema.json');
     }
 }
